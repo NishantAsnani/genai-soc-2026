@@ -34,7 +34,7 @@ RAG stands for Retrieval-Augmented Generation. It means the app first retrieves 
    ```
 5. Run the app:
    ```powershell
-   python app1.py
+   python app.py
    ```
 6. Open the Gradio URL shown in the terminal and upload one or more PDFs, then click **Index Documents** and ask a question.
 
@@ -54,4 +54,4 @@ RAG stands for Retrieval-Augmented Generation. It means the app first retrieves 
 
 ## Notes
 
-This README is written to explain what I built and what I learned while building it, without including any testing instructions.
+This README is written to explain what I built and what I learned while building it.

@@ -32,18 +32,10 @@ CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 RETRIEVAL_K = 5
 
-# ---------------------------------------------------------------------------
-# Embeddings model — loaded once at startup and reused everywhere.
-# ---------------------------------------------------------------------------
+
 embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
-# ---------------------------------------------------------------------------
-# Persistence check at startup.
-#
-# If a Chroma store already exists on disk, load it without re-indexing.
-# Otherwise leave `vectorstore` as None until the user uploads + indexes
-# their first batch of PDFs.
-# ---------------------------------------------------------------------------
+
 vectorstore = None
 if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
     vectorstore = Chroma(
@@ -69,9 +61,7 @@ def get_index_stats() -> str:
     return f"{len(sources)} document(s) indexed — {total_chunks} total chunks"
 
 
-# ---------------------------------------------------------------------------
-# Step 2: indexing
-# ---------------------------------------------------------------------------
+
 def index_documents(pdf_paths: list) -> int:
     """
     Load each PDF, split into chunks, tag with source/page metadata,
@@ -98,8 +88,6 @@ def index_documents(pdf_paths: list) -> int:
         chunks = splitter.split_documents(pages)
 
         for chunk in chunks:
-            # PyPDFLoader's "page" metadata is 0-indexed; show 1-indexed
-            # page numbers since that's how humans read PDFs.
             raw_page = chunk.metadata.get("page", 0)
             chunk.metadata["source"] = filename
             chunk.metadata["page"] = raw_page + 1
@@ -122,9 +110,7 @@ def index_documents(pdf_paths: list) -> int:
     return total_chunks
 
 
-# ---------------------------------------------------------------------------
-# Step 3: retrieval + grounded answer generation
-# ---------------------------------------------------------------------------
+
 GROUNDED_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
@@ -212,9 +198,6 @@ def ask(question: str) -> tuple:
     return response.content, context_display
 
 
-# ---------------------------------------------------------------------------
-# Step 5: Gradio UI
-# ---------------------------------------------------------------------------
 def handle_index(files):
     """Callback for the 'Index Documents' button."""
     if not files:
